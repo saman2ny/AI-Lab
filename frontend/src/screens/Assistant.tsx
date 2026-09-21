@@ -12,6 +12,20 @@ const SUGGESTIONS = [
   "Find a doctor near me",
 ];
 
+const END_CHAT_MESSAGES = new Set([
+  "bye",
+  "goodbye",
+  "ok bye",
+  "okay bye",
+  "alright bye",
+  "bye bye",
+  "end chat",
+  "end the chat",
+  "finish chat",
+  "finish the chat",
+  "done",
+]);
+
 export function Assistant() {
   const navigate = useNavigate();
 
@@ -51,13 +65,30 @@ export function Assistant() {
   }, []);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
   }, [thread, busy]);
+
+  function handleEndChat() {
+    useChatStore.getState().reset();
+    navigate("/rating");
+  }
 
   async function send(text: string) {
     const trimmed = text.trim();
 
     if (!trimmed) return;
+
+    const normalized = trimmed
+      .toLowerCase()
+      .replace(/[.!?]+$/, "")
+      .trim();
+
+    if (END_CHAT_MESSAGES.has(normalized)) {
+      handleEndChat();
+      return;
+    }
 
     addMessage({
       role: "user",
@@ -82,11 +113,6 @@ export function Assistant() {
     }
   }
 
-  function handleEndChat() {
-    useChatStore.getState().reset();
-    navigate("/rating");
-  }
-
   return (
     <div
       className="screen screen-enter"
@@ -99,6 +125,7 @@ export function Assistant() {
           <button
             className="btn-muted-text"
             onClick={handleEndChat}
+            type="button"
           >
             End chat
           </button>
@@ -132,7 +159,9 @@ export function Assistant() {
             <button
               key={s}
               className="suggestion-chip"
+              type="button"
               onClick={() => send(s)}
+              disabled={busy}
             >
               {s}
             </button>
@@ -145,17 +174,19 @@ export function Assistant() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                send(input);
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                void send(input);
               }
             }}
           />
 
           <button
             className="chat-send"
-            onClick={() => send(input)}
+            onClick={() => void send(input)}
             disabled={!input.trim() || busy}
             aria-label="Send"
+            type="button"
           >
             →
           </button>
