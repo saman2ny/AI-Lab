@@ -10,15 +10,16 @@
     "lint": "tsc --noEmit",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:deploy": "prisma migrate deploy"
+    "prisma:deploy": "prisma migrate deploy",
+    "contract:emit": "prisma contract emit"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.3",
-    "@prisma/client": "^5.19.1",
+    "@prisma/client": "^5.22.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.6.1",
     "express": "^4.19.2",
     "file-type": "^19.4.1",
     "google-auth-library": "^9.14.1",
@@ -42,15 +43,12 @@
     "@types/node": "^22.5.4",
     "@types/nodemailer": "^6.4.15",
     "@types/pdf-parse": "^1.1.4",
-    "prisma": "^5.19.1",
+    "prisma": "^5.22.0",
     "tsx": "^4.19.0",
     "typescript": "^5.5.4"
   },
   "allowScripts": {
-    "@prisma/client@5.22.0": true,
-    "@prisma/engines@5.22.0": true,
     "esbuild@0.28.2": true,
-    "prisma@5.22.0": true,
     "puppeteer@23.11.1": true,
     "sharp@0.33.5": true,
     "tesseract.js@5.1.1": true

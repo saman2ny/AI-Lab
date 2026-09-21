@@ -14,7 +14,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -60,7 +60,7 @@ model Rating {
   userId    String?
   user      User?    @relation(fields: [userId], references: [id])
   score     Int
-  comment   String? // app-level AES-256-GCM encrypted before insert (see ratingService)
-  meta      String? // JSON-encoded {valuesCount, flaggedCount, chatMessageCount}
+  comment   String?
+  meta      String?
   createdAt DateTime @default(now())
 }
