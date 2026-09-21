@@ -12,18 +12,26 @@ const SUGGESTIONS = [
   "Find a doctor near me",
 ];
 
-const END_CHAT_MESSAGES = new Set([
+const END_CHAT_PHRASES = new Set([
   "bye",
   "goodbye",
-  "ok bye",
-  "okay bye",
-  "alright bye",
+  "good bye",
   "bye bye",
+  "okay bye",
+  "ok bye",
+  "okay goodbye",
+  "ok goodbye",
   "end chat",
   "end the chat",
   "finish chat",
   "finish the chat",
+  "close chat",
+  "that's all",
+  "thats all",
+  "that is all",
   "done",
+  "i am done",
+  "im done",
 ]);
 
 export function Assistant() {
@@ -33,6 +41,7 @@ export function Assistant() {
 
   const thread = useChatStore((s) => s.thread);
   const busy = useChatStore((s) => s.busy);
+
   const addMessage = useChatStore((s) => s.addMessage);
   const setBusy = useChatStore((s) => s.setBusy);
   const consumePendingQuestion = useChatStore(
@@ -40,8 +49,51 @@ export function Assistant() {
   );
 
   const [input, setInput] = useState("");
+
   const bottomRef = useRef<HTMLDivElement>(null);
   const greeted = useRef(false);
+
+  /**
+   * Detect phrases that should end the chat.
+   *
+   * Important:
+   * These phrases NEVER go to /api/chat/message.
+   */
+  function isEndChatMessage(text: string): boolean {
+    const normalized = text
+      .trim()
+      .toLowerCase()
+      .replace(/[.!?,;:]+$/g, "")
+      .replace(/\s+/g, " ");
+
+    if (END_CHAT_PHRASES.has(normalized)) {
+      return true;
+    }
+
+    // Also catch natural variations such as:
+    // "bye for now"
+    // "okay, bye"
+    // "goodbye for now"
+    if (
+      normalized === "bye for now" ||
+      normalized === "goodbye for now" ||
+      normalized.startsWith("okay bye") ||
+      normalized.startsWith("ok bye") ||
+      normalized.startsWith("goodbye")
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  function endChat() {
+    setBusy(false);
+    setInput("");
+
+    // Go directly to the rating screen.
+    navigate("/rating");
+  }
 
   useEffect(() => {
     if (!greeted.current && thread.length === 0) {
@@ -57,10 +109,13 @@ export function Assistant() {
       const pending = consumePendingQuestion();
 
       if (pending) {
-        setTimeout(() => send(pending), 300);
+        setTimeout(() => {
+          void send(pending);
+        }, 300);
       }
     }
 
+    // This effect intentionally runs once when Assistant mounts.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -70,26 +125,23 @@ export function Assistant() {
     });
   }, [thread, busy]);
 
-  function handleEndChat() {
-    useChatStore.getState().reset();
-    navigate("/rating");
-  }
-
   async function send(text: string) {
     const trimmed = text.trim();
 
-    if (!trimmed) return;
-
-    const normalized = trimmed
-      .toLowerCase()
-      .replace(/[.!?]+$/, "")
-      .trim();
-
-    if (END_CHAT_MESSAGES.has(normalized)) {
-      handleEndChat();
+    if (!trimmed || busy) {
       return;
     }
 
+    /**
+     * IMPORTANT:
+     * Check for goodbye/end-chat BEFORE calling the API.
+     */
+    if (isEndChatMessage(trimmed)) {
+      endChat();
+      return;
+    }
+
+    // Normal chat message.
     addMessage({
       role: "user",
       text: trimmed,
@@ -108,9 +160,20 @@ export function Assistant() {
         role: "bot",
         text: reply,
       });
+    } catch (error) {
+      console.error("Chat message failed:", error);
+
+      addMessage({
+        role: "bot",
+        text: "Sorry, I couldn't process that right now. Please try again.",
+      });
     } finally {
       setBusy(false);
     }
+  }
+
+  function handleEndChatClick() {
+    endChat();
   }
 
   return (
@@ -124,7 +187,7 @@ export function Assistant() {
         action={
           <button
             className="btn-muted-text"
-            onClick={handleEndChat}
+            onClick={handleEndChatClick}
             type="button"
           >
             End chat
@@ -133,14 +196,14 @@ export function Assistant() {
       />
 
       <div className="chat-thread">
-        {thread.map((m, i) => (
+        {thread.map((message, index) => (
           <div
-            key={i}
+            key={index}
             className={`chat-bubble ${
-              m.role === "bot" ? "bot" : "user"
+              message.role === "bot" ? "bot" : "user"
             }`}
           >
-            {m.text}
+            {message.text}
           </div>
         ))}
 
@@ -155,15 +218,17 @@ export function Assistant() {
 
       <div className="chat-input-tray">
         <div className="suggestion-chips">
-          {SUGGESTIONS.map((s) => (
+          {SUGGESTIONS.map((suggestion) => (
             <button
-              key={s}
+              key={suggestion}
               className="suggestion-chip"
               type="button"
-              onClick={() => send(s)}
+              onClick={() => {
+                void send(suggestion);
+              }}
               disabled={busy}
             >
-              {s}
+              {suggestion}
             </button>
           ))}
         </div>
@@ -172,10 +237,11 @@ export function Assistant() {
           <input
             placeholder="Ask about your results"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
+            disabled={busy}
+            onChange={(event) => setInput(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
                 void send(input);
               }
             }}
@@ -183,10 +249,12 @@ export function Assistant() {
 
           <button
             className="chat-send"
-            onClick={() => void send(input)}
+            type="button"
+            onClick={() => {
+              void send(input);
+            }}
             disabled={!input.trim() || busy}
             aria-label="Send"
-            type="button"
           >
             →
           </button>
