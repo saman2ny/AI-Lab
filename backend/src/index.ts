@@ -39,7 +39,7 @@ app.use(errorHandler);
 
 startSessionSweeper();
 
-app.listen(config.port, () => {
-  console.log(`Lab Explainer backend listening on http://localhost:${config.port}`);
+app.listen(config.port, "0.0.0.0", () => {
+    console.log(`Lab Explainer backend listening on 0.0.0.0:${config.port}`);
   console.log(`MOCK_AI=${config.mockAi} · Google OAuth ${config.googleOAuthClientId ? "configured" : "disabled"}`);
 });
