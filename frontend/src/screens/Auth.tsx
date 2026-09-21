@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { continueWithGoogle, login, register } from "../lib/api";
 import { useAuthStore } from "../state/authStore";
 
@@ -181,6 +181,12 @@ export function Auth() {
       <div className="note-box" style={{ marginTop: 22 }}>
         <span className="note-dot" />
         <span>Your upload is waiting in this session only. Nothing is written to our servers.</span>
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 10, marginTop: 18, fontSize: 13 }}>
+        <Link to="/privacy" style={{ color: "#8aa8ff", textDecoration: "none" }}>Privacy Policy</Link>
+        <span style={{ color: "var(--ink-muted)" }}>·</span>
+        <Link to="/terms" style={{ color: "#8aa8ff", textDecoration: "none" }}>Terms of Service</Link>
       </div>
     </div>
   );

@@ -10,9 +10,11 @@ import { AllValues } from "./screens/AllValues";
 import { Assistant } from "./screens/Assistant";
 import { Auth } from "./screens/Auth";
 import { Landing } from "./screens/Landing";
+import { PrivacyPolicy } from "./screens/PrivacyPolicy";
 import { Rating } from "./screens/Rating";
 import { Scan } from "./screens/Scan";
 import { Summary } from "./screens/Summary";
+import { TermsPage } from "./screens/TermsPage";
 import { ValueDetail } from "./screens/ValueDetail";
 import { Verify } from "./screens/Verify";
 import { Walkthrough } from "./screens/Walkthrough";
@@ -59,6 +61,8 @@ function AppShell() {
         <Route path="/values/:key" element={<ValueDetail />} />
         <Route path="/chat" element={<Assistant />} />
         <Route path="/rating" element={<Rating />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsPage />} />
       </Routes>
 
       <Toast />
