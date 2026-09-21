@@ -1,0 +1,3 @@
+1. Gmail sign in or new user sign up not working.
+2. Chat is not ending.
+3. Before sign out, the PDF to save in local is not working.

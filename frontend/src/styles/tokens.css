@@ -1,0 +1,105 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+:root {
+  /* Colour */
+  --bg: #f7f5f1;
+  --surface: #ffffff;
+  --surface-raised: #fffdfa;
+  --ink: #23211e;
+  --ink-muted: #6b6761;
+  --ink-faint: #a9a39a;
+  --chevron: #bdb7ad;
+  --accent: #0f6e63;
+  --accent-tint: #f3f8f6;
+  --border: #e6e1d9;
+  --border-strong: #ddd8cf;
+  --divider: #efeae2;
+  --divider-dashed: #d9d3c9;
+  --track: #eae6df;
+  --normal-band: #cfe0d8;
+
+  /* Severity */
+  --sev-flag: #b0392f;
+  --sev-flag-tint: #fbeeec;
+  --sev-borderline: #96661a;
+  --sev-borderline-tint: #fbf3e4;
+  --sev-normal: #1f6b4a;
+  --sev-normal-tint: #eef5f1;
+
+  /* Type */
+  --font-ui: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Radius */
+  --radius-pill: 999px;
+  --radius-button: 11px;
+  --radius-row: 13px;
+  --radius-tint-card: 14px;
+  --radius-card: 16px;
+  --radius-dropzone: 18px;
+
+  /* Motion */
+  --ease-standard: ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+body,
+h1,
+h2,
+p {
+  text-wrap: pretty;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes prog {
+  from {
+    width: 6%;
+  }
+  to {
+    width: 96%;
+  }
+}
+
+.screen-enter {
+  animation: rise 0.3s var(--ease-standard);
+}

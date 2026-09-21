@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Helvetica Neue", Arial, sans-serif;
+        margin: 0;
+        padding: 40px 48px;
+        color: #23211e;
+        background: #f7f5f1;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 24px;
+      }
+      .brand-mark {
+        width: 20px;
+        height: 20px;
+        background: #0f6e63;
+        border-radius: 6px;
+      }
+      .brand-name {
+        font-weight: 700;
+        font-size: 13px;
+      }
+      h1 {
+        font-size: 24px;
+        margin: 0 0 4px;
+      }
+      .meta {
+        color: #6b6761;
+        font-size: 12px;
+        margin-bottom: 24px;
+      }
+      .value-block {
+        background: #ffffff;
+        border: 1px solid #e6e1d9;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 12px;
+        page-break-inside: avoid;
+      }
+      .value-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+      }
+      .value-name {
+        font-weight: 700;
+        font-size: 14px;
+      }
+      .value-number {
+        font-family: "Courier New", monospace;
+        font-size: 16px;
+      }
+      .tag {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 6px;
+        margin-top: 4px;
+      }
+      .tag-high,
+      .tag-low {
+        background: #fbeeec;
+        color: #b0392f;
+      }
+      .tag-borderline {
+        background: #fbf3e4;
+        color: #96661a;
+      }
+      .tag-normal {
+        background: #eef5f1;
+        color: #1f6b4a;
+      }
+      .plain {
+        font-size: 12.5px;
+        margin: 6px 0 4px;
+        color: #23211e;
+      }
+      .meaning {
+        font-size: 11px;
+        color: #6b6761;
+        margin: 4px 0;
+        line-height: 1.5;
+      }
+      .helps {
+        font-size: 10.5px;
+        color: #6b6761;
+        margin: 6px 0 0;
+        padding-left: 14px;
+      }
+      .ref {
+        font-family: "Courier New", monospace;
+        font-size: 10px;
+        color: #6b6761;
+      }
+      .disclaimer {
+        margin-top: 24px;
+        font-size: 10px;
+        color: #6b6761;
+        border-top: 1px dashed #d9d3c9;
+        padding-top: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <span class="brand-name">Lab Explainer</span>
+    </div>
+    <h1>{{meta.label}}</h1>
+    <div class="meta">{{meta.date}} · {{values.length}} values explained</div>
+
+    {{#each values}}
+      <div class="value-block">
+        <div class="value-header">
+          <span class="value-name">{{name}}</span>
+          <span class="value-number">{{value}} {{unit}}</span>
+        </div>
+        <span class="tag tag-{{status}}">{{statusLabel status}}</span>
+        <div class="ref">Reference: {{ref}}</div>
+        <div class="plain">{{plain}}</div>
+        <div class="meaning">{{meaning}}</div>
+        <ul class="helps">
+          {{#each helps}}
+            <li>{{this}}</li>
+          {{/each}}
+        </ul>
+      </div>
+    {{/each}}
+
+    <div class="disclaimer">
+      This explains what your report says. It is not a diagnosis — decisions belong with a clinician.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,66 @@
+// Local dev uses SQLite (zero-install, file-based) since no Docker/Postgres
+// is available on this machine. Swap the datasource to Postgres in
+// production by changing DATABASE_URL and provider — the schema below
+// avoids Postgres-only features (no native JSONB type, no pgcrypto) so the
+// swap is a config change, not a schema rewrite.
+//
+// This is the entire persisted surface area of the app. The extracted
+// report itself is never modeled here — it lives only in the backend's
+// in-memory session store (see src/services/sessionStore/inMemoryStore.ts)
+// and is never written to this database, by design.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String    @id @default(uuid())
+  email              String    @unique
+  passwordHash       String?
+  googleSub          String?   @unique
+  emailVerifiedAt    DateTime?
+  hasSeenWalkthrough Boolean   @default(false)
+  createdAt          DateTime  @default(now())
+
+  otpCodes      OtpCode[]
+  refreshTokens RefreshToken[]
+  ratings       Rating[]
+}
+
+model OtpCode {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  codeHash    String
+  expiresAt   DateTime
+  attempts    Int       @default(0)
+  resendCount Int       @default(0)
+  lastSentAt  DateTime  @default(now())
+  consumedAt  DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  tokenHash String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model Rating {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  score     Int
+  comment   String? // app-level AES-256-GCM encrypted before insert (see ratingService)
+  meta      String? // JSON-encoded {valuesCount, flaggedCount, chatMessageCount}
+  createdAt DateTime @default(now())
+}
