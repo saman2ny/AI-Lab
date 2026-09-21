@@ -7,6 +7,12 @@ import { MOCK_REPORT_META, MOCK_VALUES, WALKTHROUGH_KEYS } from "./mockData";
 // UI fully click-through-able on its own, and swaps to real behaviour
 // automatically once the backend is running.
 
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? window.location.origin).replace(/\/$/, "");
+
+function apiUrl(path: string): string {
+  return `${API_BASE_URL}/api${path}`;
+}
+
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -21,7 +27,7 @@ async function tryFetch<T>(path: string, init?: RequestInit, timeoutMs = 2500): 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const res = await fetch(`/api${path}`, {
+    const res = await fetch(apiUrl(path), {
       ...init,
       signal: controller.signal,
       credentials: "include",
@@ -111,7 +117,7 @@ export async function uploadReport(files: File[]): Promise<UploadResult> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 30000);
     try {
-      const res = await fetch("/api/reports/upload", { method: "POST", body: form, credentials: "include", signal: controller.signal });
+      const res = await fetch(apiUrl("/reports/upload"), { method: "POST", body: form, credentials: "include", signal: controller.signal });
       // As in tryFetch: a real error response (e.g. an unreadable file) is
       // returned as-is, not treated as "backend unreachable".
       return (await res.json()) as UploadResult;
@@ -171,7 +177,7 @@ export async function submitRating(score: number, comment: string): Promise<{ ok
 }
 
 export function pdfExportUrl(): string {
-  return "/api/reports/pdf";
+  return `${API_BASE_URL}/api/reports/pdf`;
 }
 
 export interface SessionInfo {

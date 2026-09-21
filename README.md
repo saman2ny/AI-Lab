@@ -27,6 +27,56 @@ npm run dev               # http://localhost:5173
 
 Open http://localhost:5173. The app works fully out of the box with **zero API keys** — see below.
 
+## Deploying to Railway
+
+### Backend service
+
+1. Create a new Railway project and add a Node service for the backend folder.
+2. Set these environment variables in Railway:
+
+```bash
+PORT=4000
+NODE_ENV=production
+FRONTEND_ORIGIN=https://your-frontend.up.railway.app
+DATABASE_URL=postgresql://user:password@host:5432/dbname
+JWT_SECRET=replace-me
+REFRESH_TOKEN_SECRET=replace-me
+DATA_ENC_KEY=replace-me-32-bytes
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-gmail-app-password
+SMTP_FROM="Lab Explainer <no-reply@gmail.com>"
+MOCK_AI=false
+```
+
+3. Build command: `npm install && npm run build`
+4. Start command: `npm run prisma:deploy && npm run start`
+5. If you keep SQLite locally, do not deploy the app with the default SQLite URL; Railway's filesystem is not persistent. Use Postgres for production.
+
+### Frontend service
+
+1. Create a second Railway service for the frontend folder.
+2. Set the frontend build env var:
+
+```bash
+VITE_API_BASE_URL=https://your-backend.up.railway.app
+```
+
+3. Build command: `npm install && npm run build`
+4. Start command: `npm run start`
+
+This keeps the frontend and backend separate while still allowing the browser to talk to the API using a real backend URL.
+
+## SMTP / email verification notes
+
+- For Gmail, use a 16-character app password instead of your normal password.
+- Set `SMTP_SECURE=true` when using port `465`.
+- Leave `SMTP_SECURE=false` with port `587` for the usual STARTTLS flow.
+- If SMTP is not configured, the backend logs the OTP to the console and still keeps the app demoable in dev.
+
+
 ## What's real vs. mocked without API keys
 
 Every external integration is env-var driven with a graceful fallback, documented in `backend/.env.example`:

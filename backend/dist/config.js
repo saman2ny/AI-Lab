@@ -4,9 +4,17 @@ function bool(v, fallback) {
         return fallback;
     return v === "true" || v === "1";
 }
+function parseOrigins(value) {
+    if (!value)
+        return ["http://localhost:5173"];
+    return value
+        .split(",")
+        .map((origin) => origin.trim())
+        .filter(Boolean);
+}
 export const config = {
     port: Number(process.env.PORT ?? 4000),
-    frontendOrigin: process.env.FRONTEND_ORIGIN ?? "http://localhost:5173",
+    frontendOrigin: parseOrigins(process.env.FRONTEND_ORIGIN),
     nodeEnv: process.env.NODE_ENV ?? "development",
     idleTimeoutMs: Number(process.env.IDLE_TIMEOUT_MS ?? 15 * 60 * 1000),
     jwtSecret: process.env.JWT_SECRET ?? "dev-jwt-secret-change-me",
@@ -19,6 +27,7 @@ export const config = {
     smtp: {
         host: process.env.SMTP_HOST || undefined,
         port: Number(process.env.SMTP_PORT ?? 587),
+        secure: bool(process.env.SMTP_SECURE, false),
         user: process.env.SMTP_USER || undefined,
         pass: process.env.SMTP_PASS || undefined,
         from: process.env.SMTP_FROM ?? "Lab Explainer <no-reply@example.com>",
