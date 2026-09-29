@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "prisma generate && tsc -p tsconfig.json",
+    "build": "prisma generate && tsc -p tsconfig.json && node -e \"require('fs').cpSync('src/services/pdfExport/templates','dist/services/pdfExport/templates',{recursive:true})\"",
     "start": "node dist/index.js",
     "lint": "tsc --noEmit",
     "prisma:generate": "prisma generate",
