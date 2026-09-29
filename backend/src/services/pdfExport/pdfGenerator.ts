@@ -9,14 +9,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 Handlebars.registerHelper("statusLabel", (status: string) => {
   switch (status) {
-    case "high":
-      return "Above range";
-    case "low":
-      return "Below range";
-    case "borderline":
-      return "Borderline";
-    default:
-      return "In range";
+    case "high": return "Above range";
+    case "low": return "Below range";
+    case "borderline": return "Borderline";
+    default: return "In range";
   }
 });
 
@@ -33,12 +29,20 @@ async function getTemplate() {
 export async function generateReportPdf(report: SessionReport): Promise<Buffer> {
   const template = await getTemplate();
   const html = template(report);
+  const browser = await puppeteer.launch({
+    headless: true,
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
 
-  const browser = await puppeteer.launch({ headless: true, args: ["--no-sandbox"] });
   try {
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: "networkidle0" });
-    const pdf = await page.pdf({ format: "a4", printBackground: true, margin: { top: "20px", bottom: "20px" } });
+    const pdf = await page.pdf({
+      format: "a4",
+      printBackground: true,
+      margin: { top: "20px", bottom: "20px" },
+    });
     return Buffer.from(pdf);
   } finally {
     await browser.close();
