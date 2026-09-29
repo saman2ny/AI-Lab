@@ -11,17 +11,18 @@ const transport = config.smtp.host
   : null;
 
 export async function sendVerificationEmail(to: string, code: string): Promise<void> {
-  if (transport) {
-    await transport.sendMail({
-      from: config.smtp.from,
-      to,
-      subject: "Your Lab Explainer verification code",
-      text: `Your verification code is ${code}. It expires in 10 minutes.`,
-    });
+  if (!transport) {
+    if (config.nodeEnv === "production") {
+      throw new Error("Email delivery is not configured on the server.");
+    }
+    console.log(`[dev email] verification code for ${to}: ${code}`);
     return;
   }
-  // Dev fallback: no SMTP configured, so the code just goes to the server
-  // console. DEV_EXPOSE_OTP additionally echoes it in the API response
-  // (see auth.routes.ts) so the whole flow is demoable without real SMTP.
-  console.log(`[dev email] verification code for ${to}: ${code}`);
+
+  await transport.sendMail({
+    from: config.smtp.from,
+    to,
+    subject: "Your Lab Explainer verification code",
+    text: `Your verification code is ${code}. It expires in 10 minutes.`,
+  });
 }
